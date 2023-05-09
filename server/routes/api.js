@@ -1,4 +1,5 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
@@ -32,23 +33,15 @@ body, saves it to the database, and sends the registered user data back in the r
 an error during the save operation, it logs the error to the console. */
 
 router.post("/register", (req, res) => {
-  /* `let userData = req.body;` is assigning the value of the request body to a variable called
-  `userData`. In this case, it is likely that the request body contains data submitted by a user
-  through a form or API call, which will be used to create a new user or authenticate an existing
-  user. */
   let userData = req.body;
-  /* `let user = new User(userData);` is creating a new instance of the `User` model with the data from
-  the request body (`userData`). This new instance can then be saved to the database using the
-  `save()` method. */
-  /* `let user = new User(userData);` is creating a new instance of the `User` model with the data from
-  the request body (`userData`). This new instance can then be saved to the database using the
-  `save()` method. */
   let user = new User(userData);
-
   user
     .save()
     .then((registeredUser) => {
-      res.status(200).send(registeredUser);
+      let payload = { subject: registeredUser._id };
+      let token = jwt.sign(payload, "secretKey");
+      // res.status(200).send(registeredUser);
+      res.status(200).send({ token });
     })
     .catch((error) => {
       console.log(error);
@@ -56,15 +49,7 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  /* `let userData = req.body;` is assigning the value of the request body to a variable called
-  `userData`. In this case, it is likely that the request body contains data submitted by a user
-  through a form or API call, which will be used to create a new user or authenticate an existing
-  user. */
   let userData = req.body;
-
-  /* `User.findOne({ email: userData.email })` is a MongoDB query that searches for a user in the
-  database whose email matches the email provided in the `userData` object. It returns a promise
-  that resolves to the user object if a match is found, or null if no match is found. */
   User.findOne({ email: userData.email })
     .then((user) => {
       if (!user) {
@@ -76,7 +61,9 @@ router.post("/login", (req, res) => {
         ) {
           res.status(401).send("Invalid email Password");
         } else {
-          res.status(200).send(user);
+          let payload = { subject: user._id };
+          let token = jwt.sign(payload, "secretKey");
+          res.status(200).send({ token });
         }
       }
     })

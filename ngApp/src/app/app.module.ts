@@ -11,6 +11,7 @@ import { AppRoutingModule } from './app.routing.module';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { EventService } from './services/event.service';
+import { AuthGuard } from './auth.guard';
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +27,7 @@ import { EventService } from './services/event.service';
     FormsModule,
     HttpClientModule,
   ],
-  providers: [AuthService, EventService],
+  providers: [AuthService, EventService, AuthGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
