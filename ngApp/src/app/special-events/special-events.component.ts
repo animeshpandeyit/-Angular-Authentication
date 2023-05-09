@@ -8,11 +8,17 @@ import { EventService } from '../services/event.service';
   styleUrls: ['./special-events.component.css'],
 })
 export class SpecialEventsComponent implements OnInit {
-  specialEvents = [];
+  specialEvents = [
+    {
+      name: '',
+      description: '',
+      date: '',
+    },
+  ];
   constructor(private _eventService: EventService, private router: Router) {}
   ngOnInit(): void {
     this._eventService.getSpecialEvents().subscribe({
-      next: (res) => this.specialEvents = res,
+      next: (res) => (this.specialEvents = res),
       error: (err) => console.log(err),
     });
   }
