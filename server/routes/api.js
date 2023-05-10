@@ -96,7 +96,7 @@ router.get("/events", (req, res) => {
   res.json(events);
 });
 
-router.get("/special", (req, res) => {
+router.get("/special", verifyToken, (req, res) => {
   const events = [
     {
       _id: 1,
@@ -144,6 +144,29 @@ router.post("/product", (req, res) => {
       console.log(error);
     });
 });
+
+function verifyToken(req, res, next) {
+  if (!req.headers.authorization) {
+    return res.status(401).send("Unauthorized request");
+  }
+  let token = req.headers.authorization.split(" ")[1];
+  if (token === "null") {
+    return res.status(401).send("Unauthorized request");
+  }
+  /* `let payload = jwt.verify(token, "secretKey");` is verifying the token received in the request
+  header by decoding it using the secret key "secretKey". If the token is valid, it returns the
+  payload object which contains the user ID. This payload object is then added to the request object
+  as `req.userId` using `req.userId = payload.subject;` in the `verifyToken` middleware function. */
+  let payload = jwt.verify(token, "secretKey");
+  if (!payload) {
+    return res.status(401).send("Unauthorized request");
+  }
+  /* `req.userId = payload.subject;` is adding the decoded user ID from the JWT token to the request
+  object as a new property called `userId`. This allows other middleware functions or routes to
+  access the user ID and perform actions based on the user's identity. */
+  req.userId = payload.subject;
+  next();
+}
 
 module.exports = router;
 
